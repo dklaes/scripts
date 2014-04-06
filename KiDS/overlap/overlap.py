@@ -39,7 +39,6 @@ for i in range(len(coordsKIDS)):
 
 overlap = overlap.reshape((-1,4))
 
-os.popen("rm runs_KIDS_?_tmp.txt")
 for k in range(len(overlap)):
 	RA = ((str(overlap[k][0])).replace("-", "m")).replace("+", "p")
 	DEC = ((str(overlap[k][1])).replace("-", "m")).replace("+", "p")
@@ -57,19 +56,18 @@ os.popen("cat runs_KIDS_?.txt | sort | uniq > runs_KIDS_total.txt")
 os.popen("rm runs_KIDS_?_tmp.txt")
 
 
-#os.popen("rm runs_ATLAS_?_tmp.txt")
-#for k in range(len(overlap)):
-#        RA = ((str(overlap[k][2])).replace("-", "m")).replace("+", "p") 
-#        DEC = ((str(overlap[k][3])).replace("-", "m")).replace("+", "p")
-#        os.popen("grep ATLAS_" + RA + "_" + DEC + " ATLAS_summary_images_u_SDSS.txt | awk '{print $1}' | sort | uniq >> runs_ATLAS_u_tmp.txt")
-#        os.popen("grep ATLAS_" + RA + "_" + DEC + " ATLAS_summary_images_g_SDSS.txt | awk '{print $1}' | sort | uniq >> runs_ATLAS_g_tmp.txt")
-#        os.popen("grep ATLAS_" + RA + "_" + DEC + " ATLAS_summary_images_i_SDSS.txt | awk '{print $1}' | sort | uniq >> runs_ATLAS_i_tmp.txt")
-#        os.popen("grep ATLAS_" + RA + "_" + DEC + " ATLAS_summary_images_r_SDSS.txt | awk '{print $1}' | sort | uniq >> runs_ATLAS_r_tmp.txt")
-#
-#os.popen("cat runs_ATLAS_u_tmp.txt | sort | uniq > runs_ATLAS_u.txt")
-#os.popen("cat runs_ATLAS_g_tmp.txt | sort | uniq > runs_ATLAS_g.txt")
-#os.popen("cat runs_ATLAS_i_tmp.txt | sort | uniq > runs_ATLAS_i.txt")
-#os.popen("cat runs_ATLAS_r_tmp.txt | sort | uniq > runs_ATLAS_r.txt")
-#os.popen("cat runs_ATLAS_?.txt | sort | uniq > runs_ATLAS_total.txt")
+for k in range(len(overlap)):
+        RA = ((str(overlap[k][2])).replace("-", "m")).replace("+", "p") 
+        DEC = ((str(overlap[k][3])).replace("-", "m")).replace("+", "p")
+        os.popen("grep ATLAS_" + RA + "_" + DEC + " ATLAS_summary_images_u_SDSS.txt | awk '{print $1}' | sort | uniq >> runs_ATLAS_u_tmp.txt")
+        os.popen("grep ATLAS_" + RA + "_" + DEC + " ATLAS_summary_images_g_SDSS.txt | awk '{print $1}' | sort | uniq >> runs_ATLAS_g_tmp.txt")
+        os.popen("grep ATLAS_" + RA + "_" + DEC + " ATLAS_summary_images_i_SDSS.txt | awk '{print $1}' | sort | uniq >> runs_ATLAS_i_tmp.txt")
+        os.popen("grep ATLAS_" + RA + "_" + DEC + " ATLAS_summary_images_r_SDSS.txt | awk '{print $1}' | sort | uniq >> runs_ATLAS_r_tmp.txt")
 
-#os.popen("rm runs_ATLAS_?_tmp.txt")
+os.popen("cat runs_ATLAS_u_tmp.txt | sort | uniq > runs_ATLAS_u.txt")
+os.popen("cat runs_ATLAS_g_tmp.txt | sort | uniq > runs_ATLAS_g.txt")
+os.popen("cat runs_ATLAS_i_tmp.txt | sort | uniq > runs_ATLAS_i.txt")
+os.popen("cat runs_ATLAS_r_tmp.txt | sort | uniq > runs_ATLAS_r.txt")
+os.popen("cat runs_ATLAS_?.txt | sort | uniq > runs_ATLAS_total.txt")
+
+os.popen("rm runs_ATLAS_?_tmp.txt")
