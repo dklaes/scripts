@@ -113,14 +113,47 @@ echo "Memory in (MB):" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 awk '{print $11}' cpu_mem_check_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
     awk -f meanminmax.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
-echo "Reading (in KB/s):" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
-awk '{print $5}' iotop_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
+echo "Reading (in MB/s):" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
+awk '{print $5/1024.0}' iotop_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
     awk -f meanminmax.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
-echo "Writing (in KB/s):" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
-awk '{print $7}' iotop_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
+echo "Writing (in MB/s):" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
+awk '{print $7/1024.0}' iotop_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
     awk -f meanminmax.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "Calculating statistics... Done!"
+
+echo ""
+
+echo "Starting plotting..."
+gnuplot<<EOF
+set term png
+
+# CPU and memory usage
+reset
+set output '${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_cpu_mem.png'
+set xlabel 'Time in seconds since start'
+set ylabel 'CPU usage in percent'
+set y2label 'Memory usage in MB'
+set title 'CPU and memory usage'
+set ytics nomirror
+set y2tics
+set autoscale
+set yrange[0:100]
+plot 'cpu_mem_check_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt' u 9:10 notitle pt 7 lc 1 ps 0.5 axes x1y1, \
+     'cpu_mem_check_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt' u 9:11 notitle pt 7 lc 2 ps 0.5 axes x1y2
+
+# IO
+reset
+set autoscale
+set output '${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_IO.png'
+set xlabel 'Time in seconds since start'
+set ylabel 'Read / write rate in MB/s'
+set title 'IO'
+plot 'iotop_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt' u (\$5/1024.0) notitle pt 7 lc 1 ps 0.5, \
+     'iotop_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt' u (\$7/1024.0) notitle pt 7 lc 2 ps 0.5
+
+EOF
+echo "Starting plotting... Done!"
 
 echo ""
 
