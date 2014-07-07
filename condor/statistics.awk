@@ -27,6 +27,6 @@ END {
 	    print "Minimum     = ", min;
 	    print "Maximum     = ", max;
 	    print "sigma       = ", sqrt(1.0/number * ( sum2 - (sum1*sum1/number)));
-	    print "rms =       ", sqrt(sum2/number);
+	    print "rms         = ", sqrt(sum2/number);
 	}
 }
