@@ -69,19 +69,24 @@ $1 & PID=$!
 # RUN variable: 0 means program is running, 1 means program has finished.
 RUN=0
 
+# Start monitoring the I/O with iostats. Currently this is the only possibility
+# I know and needs sudo rights.
+sudo iotop -kt -p ${PID} -qqq > iotop_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt & PIDIO=$!
+
 while [ ${RUN} -eq 0 ]
 do
   TIME=`date +"%Y %m %d %H %M %S %2N"`
   # Now getting the used memory from ps in MB.
-  MEMORY=`ps aux | awk -v PID=${PID} '$2==PID {print $6/1024.0}'`
+  PSAUX=`ps aux | awk -v PID=${PID} '$2==PID {print $3, $6/1024.0}'`
   NUM=`ps aux | awk -v PID=${PID} '$2==PID {print $1}' | wc -l`
 
   if [ ${NUM} -eq 1 ]; then
     # Everything is fine, print the memory in MB into log file.
-    echo "${TIME} ${MEMORY}" >> memcheck_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt
+    echo "${TIME} ${PSAUX}" >> cpu_mem_check_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt
   elif [ ${NUM} -eq 0 ]; then
     # The program has finished. End logging.
     RUN=1
+    sudo kill ${PIDIO}
   fi
 
   sleep ${DELAY}
@@ -93,13 +98,26 @@ echo "Memory checking programm finished at ${TIMESTOP}."
 echo ""
 
 echo "Calculating statistics..."
-awk '{print $8}' memcheck_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
-    awk -f meanminmax.awk > memcheck_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
+echo "CPU (in %):" > ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
+awk '{print $8}' cpu_mem_check_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
+    awk -f meanminmax.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
+echo "" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
+echo "Memory in (MB):" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
+awk '{print $9}' cpu_mem_check_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
+    awk -f meanminmax.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
+echo "" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
+echo "Reading (in KB/s):" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
+awk '{print $5}' iotop_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
+    awk -f meanminmax.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
+echo "" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
+echo "Writing (in KB/s):" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
+awk '{print $7}' iotop_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
+    awk -f meanminmax.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "Calculating statistics... Done!"
 
 echo ""
 
 echo "Statistics:"
-cat memcheck_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
+cat ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 
 exit 0;
