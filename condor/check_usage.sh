@@ -68,21 +68,28 @@ $1 & PID=$!
 
 # RUN variable: 0 means program is running, 1 means program has finished.
 RUN=0
+DURATIONOLD=""
 
 # Start monitoring the I/O with iostats. Currently this is the only possibility
 # I know and needs sudo rights.
 sudo iotop -kt -p ${PID} -qqq > iotop_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt & PIDIO=$!
 
+
 while [ ${RUN} -eq 0 ]
 do
-  TIME=`date +"%Y %m %d %H %M %S %2N"`
+  TIME=`date +"%Y %m %d %H %M %S %2N %s.%2N"`
+  if [ -z ${DURATIONOLD} ]; then
+    DURATIONOLD=`echo ${TIME} | awk '{print $8}'`
+  fi
+  DURATION=`echo ${TIME} | awk -v DURATIONOLD=${DURATIONOLD} '{print $8-DURATIONOLD}'`
+
   # Now getting the used memory from ps in MB.
   PSAUX=`ps aux | awk -v PID=${PID} '$2==PID {print $3, $6/1024.0}'`
   NUM=`ps aux | awk -v PID=${PID} '$2==PID {print $1}' | wc -l`
 
   if [ ${NUM} -eq 1 ]; then
     # Everything is fine, print the memory in MB into log file.
-    echo "${TIME} ${PSAUX}" >> cpu_mem_check_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt
+    echo "${TIME} ${DURATION} ${PSAUX}" >> cpu_mem_check_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt
   elif [ ${NUM} -eq 0 ]; then
     # The program has finished. End logging.
     RUN=1
@@ -99,11 +106,11 @@ echo ""
 
 echo "Calculating statistics..."
 echo "CPU (in %):" > ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
-awk '{print $8}' cpu_mem_check_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
+awk '{print $10}' cpu_mem_check_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
     awk -f meanminmax.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "Memory in (MB):" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
-awk '{print $9}' cpu_mem_check_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
+awk '{print $11}' cpu_mem_check_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
     awk -f meanminmax.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "Reading (in KB/s):" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
