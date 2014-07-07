@@ -105,11 +105,11 @@ echo "Memory checking programm finished at ${TIMESTOP}."
 echo ""
 
 echo "Calculating statistics..."
-echo "CPU (in %):" > ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
+echo "CPU usage (in %):" > ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 awk '{print $10}' cpu_mem_check_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
     awk -f statistics.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
-echo "Memory in (MB):" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
+echo "Memory usage in (MB):" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 awk '{print $11}' cpu_mem_check_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
     awk -f statistics.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
@@ -132,8 +132,8 @@ set term png
 reset
 set output '${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_cpu_mem.png'
 set xlabel 'Time in seconds since start'
-set ylabel 'CPU usage in percent'
-set y2label 'Memory usage in MB'
+set ylabel 'CPU usage in percent (red)'
+set y2label 'Memory usage in MB (green)'
 set title 'CPU and memory usage'
 set ytics nomirror
 set y2tics
@@ -147,7 +147,7 @@ reset
 set autoscale
 set output '${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_IO.png'
 set xlabel 'Time in seconds since start'
-set ylabel 'Read / write rate in MB/s'
+set ylabel 'Read (red) / Write (green) rate in MB/s'
 set title 'IO'
 plot 'iotop_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt' u (\$5/1024.0) notitle pt 7 lc 1 ps 0.5, \
      'iotop_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt' u (\$7/1024.0) notitle pt 7 lc 2 ps 0.5
