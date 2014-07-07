@@ -107,19 +107,19 @@ echo ""
 echo "Calculating statistics..."
 echo "CPU (in %):" > ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 awk '{print $10}' cpu_mem_check_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
-    awk -f meanminmax.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
+    awk -f statistics.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "Memory in (MB):" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 awk '{print $11}' cpu_mem_check_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
-    awk -f meanminmax.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
+    awk -f statistics.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "Reading (in MB/s):" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 awk '{print $5/1024.0}' iotop_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
-    awk -f meanminmax.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
+    awk -f statistics.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "Writing (in MB/s):" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 awk '{print $7/1024.0}' iotop_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
-    awk -f meanminmax.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
+    awk -f statistics.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "Calculating statistics... Done!"
 
 echo ""
