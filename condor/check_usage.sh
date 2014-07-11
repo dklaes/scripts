@@ -1,3 +1,4 @@
+#!/bin/bash
 # -----------------------------------------------------------------------------
 # File Name:           check_mmory.sh
 # Author:              Dominik Klaes (dklaes@astro.uni-bonn.de)
@@ -63,17 +64,24 @@ ARGUMENTS=`echo $1 | sed 's/'${PROGRAM}'//g' | sed 's/ //' | sed 's/ /_/g' | sed
 
 echo "Memory checking programm called at ${TIMESTART} with argument(s): $1"
 
+# Get the sudo rights or all the following scripts.
+sudo touch blank
+if [ -e blank ]; then
+  echo "Getting sudo rights completed!"
+  sudo rm blank
+else
+  echo "Unable to get sudo rights. Exiting!"
+  exit 1;
+fi
+
 # Executing the programm and saving its PID.
 $1 & PID=$!
 
 # RUN variable: 0 means program is running, 1 means program has finished.
 RUN=0
 DURATIONOLD=""
-
-# Start monitoring the I/O with iostats. Currently this is the only possibility
-# I know and needs sudo rights.
-sudo iotop -kt -p ${PID} -qqq > iotop_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt & PIDIO=$!
-
+COVERED=""
+IOPIDS=""
 
 while [ ${RUN} -eq 0 ]
 do
@@ -81,23 +89,43 @@ do
   if [ -z ${DURATIONOLD} ]; then
     DURATIONOLD=`echo ${TIME} | awk '{print $8}'`
   fi
-  DURATION=`echo ${TIME} | awk -v DURATIONOLD=${DURATIONOLD} '{print $8-DURATIONOLD}'`
+  DURATION=`echo ${TIME} ${DURATIONOLD}| awk '{print $8-$9}'`
 
-  # Now getting the used memory from ps in MB.
-  PSAUX=`ps aux | awk -v PID=${PID} '$2==PID {print $3, $6/1024.0}'`
-  NUM=`ps aux | awk -v PID=${PID} '$2==PID {print $1}' | wc -l`
+  # Get the PIDs of the child processes:
+  CHILDS=`pstree -pA ${PID} | awk -F'(' '{print $NF}' | awk -F')' '{print $1}'`
+  if [ "${PID}" == "${CHILDS}" ]; then
+    ALLPIDS=`echo ${PID}`
+  else
+    ALLPIDS=`echo ${PID} ${CHILDS}`
+  fi
 
-  if [ ${NUM} -eq 1 ]; then
-    # Everything is fine, print the memory in MB into log file.
-    echo "${TIME} ${DURATION} ${PSAUX}" >> cpu_mem_check_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt
-  elif [ ${NUM} -eq 0 ]; then
+  # Writing CPU and memory usage for all PIDs at once:
+  ps u -p "${ALLPIDS}" --no-heading | awk -v PSAUX="$TIME $DURATION" '{print PSAUX, $2, $3, $6/1024.0}' \
+       >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_cpu_mem.txt
+
+  for i in ${ALLPIDS}
+  do
+    # Start monitoring the I/O with iostats. Currently this is the only
+    # possibility I know and needs sudo rights.
+    if [[ "${COVERED}" =~ "${i}" ]]; then
+      echo ""
+    else
+      sudo iotop -kt -p ${i} -qqq > ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_IO_${i}.txt & IOPID=$!
+      COVERED=`echo ${COVERED} ${i}`
+      IOPIDS=`echo ${IOPIDS} ${IOPID}`
+    fi
+  done
+
+  if [ `ps u -p ${PID} | wc -l` -eq 1 ]; then
     # The program has finished. End logging.
     RUN=1
-    sudo kill ${PIDIO}
   fi
 
   sleep ${DELAY}
 done
+
+# The iotop processes don't seem to stop here, so we have to kill them manually.
+sudo kill ${IOPIDS}
 
 TIMESTOP=`date +"%Y.%m.%d %H:%M:%S"`
 echo "Memory checking programm finished at ${TIMESTOP}."
@@ -105,20 +133,39 @@ echo "Memory checking programm finished at ${TIMESTOP}."
 echo ""
 
 echo "Calculating statistics..."
+
+awk '{print $9}' ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_cpu_mem.txt | sort -u > timestamps_cpu_mem_uniq.txt
+while read TIME
+do
+  awk -v TIME=${TIME} '$9==TIME {sum1+=$11; sum2+=$12} END {print TIME, sum1, sum2}' \
+       ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_cpu_mem.txt \
+       >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_cpu_mem_sum.txt
+done < timestamps_cpu_mem_uniq.txt
+
 echo "CPU usage (in %):" > ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
-awk '{print $10}' cpu_mem_check_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
+awk '{print $2}' ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_cpu_mem_sum.txt | \
     awk -f statistics.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "Memory usage in (MB):" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
-awk '{print $11}' cpu_mem_check_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
+awk '{print $3}' ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_cpu_mem_sum.txt | \
     awk -f statistics.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
+
+
+awk '{print $1}' ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_IO_*.txt | sort -u > timestamps_IO_uniq.txt
+while read TIME
+do
+  awk -v TIME=${TIME} '$1==TIME {sum1+=$5; sum2+=$7} END {print TIME, sum1/1024.0, sum2/1024.0}' \
+       ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_IO_*.txt \
+       >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_IO_sum.txt
+done < timestamps_IO_uniq.txt
+
 echo "" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "Reading (in MB/s):" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
-awk '{print $5/1024.0}' iotop_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
+awk '{print $2}' ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_IO_sum.txt | \
     awk -f statistics.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "Writing (in MB/s):" >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
-awk '{print $7/1024.0}' iotop_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt | \
+awk '{print $3}' ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_IO_sum.txt | \
     awk -f statistics.awk >> ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 echo "Calculating statistics... Done!"
 
@@ -138,9 +185,8 @@ set title 'CPU and memory usage'
 set ytics nomirror
 set y2tics
 set autoscale
-set yrange[0:100]
-plot 'cpu_mem_check_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt' u 9:10 notitle pt 7 lc 1 ps 0.5 axes x1y1, \
-     'cpu_mem_check_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt' u 9:11 notitle pt 7 lc 2 ps 0.5 axes x1y2
+plot '${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_cpu_mem_sum.txt' u 1:2 notitle pt 7 lc 1 ps 0.5 axes x1y1, \
+     '${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_cpu_mem_sum.txt' u 1:3 notitle pt 7 lc 2 ps 0.5 axes x1y2
 
 # IO
 reset
@@ -149,8 +195,8 @@ set output '${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_IO.png'
 set xlabel 'Time in seconds since start'
 set ylabel 'Read (red) / Write (green) rate in MB/s'
 set title 'IO'
-plot 'iotop_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt' u (\$5/1024.0) notitle pt 7 lc 1 ps 0.5, \
-     'iotop_${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}.txt' u (\$7/1024.0) notitle pt 7 lc 2 ps 0.5
+plot '${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_IO_sum.txt' u 2 notitle pt 7 lc 1 ps 0.5, \
+     '${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_IO_sum.txt' u 3 notitle pt 7 lc 2 ps 0.5
 
 EOF
 echo "Starting plotting... Done!"
@@ -160,4 +206,5 @@ echo ""
 echo "Statistics:"
 cat ${PROGRAM}_${ARGUMENTS}_${TIMESTARTLOG}_statistics.txt
 
+rm timestamps_cpu_mem_uniq.txt timestamps_IO_uniq.txt
 exit 0;
