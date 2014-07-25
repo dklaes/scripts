@@ -1,0 +1,36 @@
+Known problem found in ATLAS_32p8_m29p5/u_SDSS. Skipping!
+Known problem found in ATLAS_32p8_m29p5/i_SDSS. Skipping!
+Known problem found in ATLAS_337p8_m30p6/i_SDSS. Skipping!
+Known problem found in ATLAS_337p8_m30p6/z_SDSS. Skipping!
+Known problem found in ATLAS_338p1_m32p5/g_SDSS. Skipping!
+Known problem found in ATLAS_338p1_m32p5/r_SDSS. Skipping!
+Known problem found in ATLAS_338p9_m30p6/i_SDSS. Skipping!
+Known problem found in ATLAS_338p9_m30p6/z_SDSS. Skipping!
+Known problem found in ATLAS_339p3_m32p5/g_SDSS. Skipping!
+Known problem found in ATLAS_339p3_m32p5/r_SDSS. Skipping!
+Known problem found in ATLAS_33p5_m30p5/g_SDSS. Skipping!
+Known problem found in ATLAS_33p9_m29p5/i_SDSS. Skipping!
+Known problem found in ATLAS_340p0_m30p6/i_SDSS. Skipping!
+Known problem found in ATLAS_340p0_m30p6/z_SDSS. Skipping!
+Known problem found in ATLAS_340p4_m32p5/g_SDSS. Skipping!
+Known problem found in ATLAS_340p4_m32p5/r_SDSS. Skipping!
+Known problem found in ATLAS_341p2_m30p6/i_SDSS. Skipping!
+Known problem found in ATLAS_341p2_m30p6/z_SDSS. Skipping!
+Known problem found in ATLAS_341p6_m32p5/g_SDSS. Skipping!
+Known problem found in ATLAS_341p6_m32p5/r_SDSS. Skipping!
+Known problem found in ATLAS_342p7_m32p5/i_SDSS. Skipping!
+Known problem found in ATLAS_343p9_m32p5/i_SDSS. Skipping!
+Known problem found in ATLAS_345p1_m32p5/i_SDSS. Skipping!
+Known problem found in ATLAS_346p2_m32p5/i_SDSS. Skipping!
+New problem found in ATLAS_349p1_m30p6/u_SDSS!
+Known problem found in ATLAS_349p7_m32p5/i_SDSS. Skipping!
+Known problem found in ATLAS_350p9_m32p5/i_SDSS. Skipping!
+Known problem found in ATLAS_352p0_m32p5/i_SDSS. Skipping!
+New problem found in ATLAS_353p2_m32p5/i_SDSS!
+New problem found in ATLAS_354p4_m32p5/i_SDSS!
+New problem found in ATLAS_355p5_m32p5/i_SDSS!
+New problem found in ATLAS_356p7_m32p5/i_SDSS!
+New problem found in ATLAS_357p8_m32p5/i_SDSS!
+New problem found in ATLAS_359p0_m32p5/i_SDSS!
+New problem found in ATLAS_35p0_m29p5/i_SDSS!
+New problem found in ATLAS_35p4_m31p5/u_SDSS!

@@ -1,0 +1,32 @@
+ATLAS_341p2_m30p6_i_SDSS: Missing crosstalk correction file
+ATLAS_352p0_m32p5_i_SDSS: Missing crosstalk correction file
+ATLAS_350p9_m32p5_i_SDSS: Missing crosstalk correction file
+ATLAS_349p7_m32p5_i_SDSS: Missing crosstalk correction file
+ATLAS_346p2_m32p5_i_SDSS: Missing crosstalk correction file
+ATLAS_345p1_m32p5_i_SDSS: Missing crosstalk correction file
+ATLAS_344p6_m30p6_z_SDSS: Data not copied
+ATLAS_344p6_m30p6_r_SDSS: Data not copied
+ATLAS_344p6_m30p6_i_SDSS: Data not copied
+ATLAS_344p6_m30p6_i_SDSS: Missing crosstalk correction file
+ATLAS_343p9_m32p5_i_SDSS: Missing crosstalk correction file
+ATLAS_342p7_m32p5_i_SDSS: Missing crosstalk correction file
+ATLAS_341p6_m32p5_r_SDSS: Missing crosstalk correction file
+ATLAS_341p6_m32p5_g_SDSS: Missing crosstalk correction file
+ATLAS_32p8_m29p5_u_SDSS: Data not copied
+ATLAS_32p8_m29p5_i_SDSS: Missing crosstalk correction file
+ATLAS_337p8_m30p6_z_SDSS: Missing crosstalk correction file
+ATLAS_337p8_m30p6_i_SDSS: Missing crosstalk correction file
+ATLAS_338p1_m32p5_r_SDSS: Missing crosstalk correction file
+ATLAS_338p1_m32p5_g_SDSS: Missing crosstalk correction file
+ATLAS_338p9_m30p6_z_SDSS: Missing crosstalk correction file
+ATLAS_338p9_m30p6_i_SDSS: Missing crosstalk correction file
+ATLAS_339p3_m32p5_r_SDSS: Missing crosstalk correction file
+ATLAS_339p3_m32p5_g_SDSS: Missing crosstalk correction file
+ATLAS_33p5_m30p5_g_SDSS: Data not copied
+ATLAS_33p9_m29p5_i_SDSS: Missing crosstalk correction file
+ATLAS_340p0_m30p6_z_SDSS: Missing crosstalk correction file
+ATLAS_340p0_m30p6_i_SDSS: Missing crosstalk correction file
+ATLAS_340p4_m32p5_r_SDSS: Missing crosstalk correction file
+ATLAS_340p4_m32p5_g_SDSS: Missing crosstalk correction file
+ATLAS_341p2_m30p6_z_SDSS: Missing crosstalk correction file
+
