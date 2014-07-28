@@ -90,9 +90,9 @@ for field in field_list:
     # Combine all required directory and file names.
     coadd = os.path.join(image_dir, field, band, reduction, '%s_%s.%sA.swarp.cut.fits' % \
                              (field, band, Ver))
-    mask_star_reg1_f = '%s_%s_stars_13.5_11.3.reg' % (field, band,)
+    mask_star_reg1_f = '%s_%s_stars.reg' % (field, band,)
     mask_star_reg1 = os.path.join(image_dir, field, band, masks, mask_star_reg1_f)
-    mask_star_reg2_f = '%s_%s_stars_12_10.5.reg' % (field, band,)
+    mask_star_reg2_f = '%s_%s_stars_13.5_10.5.reg' % (field, band,)
     mask_star_reg2 = os.path.join(image_dir, field, band, masks, mask_star_reg2_f)
 
     mask_original_dir = os.path.join(image_dir, field, band, masks)
