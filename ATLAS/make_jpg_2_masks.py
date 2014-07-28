@@ -166,7 +166,7 @@ for field in field_list:
 
     # Make the colored image.
     stiff_var = ' -BINNING 8'
-    shcommand = '%s %s -OUTFILE_NAME %s %s %s' % (stiff, stiff_var, tiff, coadd_mask_fits1, coadd_mask_fits2)
+    shcommand = '%s %s -OUTFILE_NAME %s %s %s %s' % (stiff, stiff_var, tiff, coadd_mask_fits1, coadd_mask_fits2, coadd_mask_fits1)
     S.call(shcommand, shell=True)
 
     # Convert the final TIFF image to jpg.
