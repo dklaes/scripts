@@ -1,22 +1,16 @@
 #!/usr/bin/env python
 
-# ----------------------------------------------------------------------------
-# File Name:           make_jpg_mask.py
-# Author:              Dominik Klaes (dklaes@astro.uni-bonn.de)
-# Last modified on:    24.07.2014
-# Version:             V1.0
-# Description:         Creating jpg images from 3 color images plus stellar
-#                      masks.
-#                      This script is based upon a script from Reiko Nakajima
-#                      (reiko@astro.uni-bonn.de) and Douglas Applegate
-#                      (dapple@astro.uni-bonn.de).
-# ----------------------------------------------------------------------------
-
 import subprocess as S
 import numpy as np
 import pylab as P
 import sys
 import os
+
+"""
+make_jpg_mask.py
+ 
+
+"""
 
 usage = """
 make_jpg_mask.py
@@ -31,73 +25,67 @@ usage: make_jpg_mask.py <field_list_file>
 
 
 #
-# Specify data directories and variables
+# specify data directories
 #
-# Data reduction version
 Ver = 'V0.5.5'
-# Main directory, also known as MD in THELI
+new_ver = '%s.manual'
 image_dir = '/vol/braid1/vol3/dklaes/ATLASCOLLAB/'
-# Filter of which the masks shall be used (supposed to be at
-# 'image_dir/POINTING/').
 band = 'r_SDSS'
-# The directory name where the coadded images are (supposed to be at
-# 'image_dir/POINTING/band/').
-reduction = 'coadd_%sA' % (Ver,)
-# The directory name where the masks are (supposed to be at
-# 'image_dir/POINTING/band/').
+reduction = 'coadd_%sA' % (Ver,)   # need the coadded image
 masks = 'masks_%sA' % (Ver,)       # ...as well as the masks
 #stellar_mask_dir = '/home/reiko/1project/rcslens/stellar_masks/reg'  # ... and the new stellar masks
 #manual_mask_dir = '/home/reiko/1project/rcslens/manual_masks/reg'  # ... and the new manual masks
-final_mask_dir = '/users/dklaes/ATLAS_masks' # where the JPG files will reside
+# where the JPG files will reside
+final_mask_dir = '/users/dklaes/ATLAS_masks'
 shcommand = 'mkdir -p %s' % (final_mask_dir,)
 S.call(shcommand, shell=True)
 
+# commands
 
-# Specify the paths to programs used later.
 ww = 'ww_theli'
-stiff = '/users/dklaes/Downloads/stiff-2.4.0/src/stiff'
 
-# Name area file (keeps record of the percentage of masked pixels).
-# In the current used version of WeightWatcher this is not possible.
+# name area file (keeps record of the percentage of masked pixels)
 #masked_percentage_file = 'masked_percentage.txt'
 #txtf = open(masked_percentage_file, 'w')
 #print >> txtf, "#field, masked_percentage"
 
-# Create blank file (only needs to be run once if there is none).
+# create blank file (only needs to be run once)
 #shcommand = "ic -p 8 -c 18500 18500 '0' > blank.fits"
-#print shcommand
-#S.call(shcommand, shell=True)
 
-
-# Check if the number of process arguments are correct.
+#
+# process arguments
+#
 if len(sys.argv) != 2:
     print usage
     sys.exit(2)
 
-
-# Get field list from file (first argument).
+#
+# get field list
+#
 try:
     field_list = filter(lambda s: not s.startswith('#'), open(sys.argv[1], 'r').readlines())
     field_list = map(lambda s: s.split()[0], field_list)
 except IOError:
-    print 'Cannot open field file %s, exiting!' % (sys.argv[1],)
+    print 'Cannot open field file %s, exiting' % (sys.argv[1],)
     sys.exit(2)
 
 
 
-# Generate the mask fits files.
+#
+# generate mask fits files
+#
 for field in field_list:
 
     print field
 
-    # Combine all required directory and file names.
+    #
+    # get file names
+    #
     coadd = os.path.join(image_dir, field, band, reduction, '%s_%s.%sA.swarp.cut.fits' % \
                              (field, band, Ver))
     mask_star_reg_f = '%s_%s_stars.reg' % (field, band,)
     mask_star_reg = os.path.join(image_dir, field, band, masks, mask_star_reg_f)
 
-    # Because currently we do not do any manual masking, saturated mask or
-    # asteroid masks, this part is commented out.
 #    manual_mask_reg_f = '%s.manualmask.reg' % (field)
 #    manual_mask_reg = os.path.join(manual_mask_dir, manual_mask_reg_f)
 #    if not os.path.isfile(manual_mask_reg):
@@ -120,17 +108,18 @@ for field in field_list:
 #                                             mask_saturated_reg, mask_asteroids_reg, mask_reg)
 #    S.call(shcommand, shell=True)  # created new lensingcandidate mask with better stellar masks
 
-    # Here the names of the different outfiles are defined, first the mask-only
-    # FITS image, then mask + coadd FITS and as last one the output TIFF image.
     mask_fits = '%s/%s_mask.fits' % (final_mask_dir, field)
     coadd_mask_fits = '%s/%s_coadd_mask.fits' % (final_mask_dir, field)
     tiff = '%s/%s.tiff' % (final_mask_dir, field)
 
-    # Convert region file "boxes" into "polygons", currently not needed.
+    #
+    # convert region file "boxes" into "polygons"
+    #
     #convert_boxes_into_polygons(mask_reg, mask_poly_reg)
 
-    # Run Weight Watchers (ww) (weight=0 pixels will be masked)
-    # Currently commented out because we are not using any weighing.
+    #
+    # run Weight Watchers (ww) (weight=0 pixels will be masked)
+    #
 #    weight_fits_file = '%s_%s.%sA.swarp.cut.weight.fits' % (field, band, Ver)
 #    weight_fits = os.path.join(image_dir, field, band, reduction, 
 #                               '%s_%s.%sA.swarp.cut.weight.fits.gz' % (field, band, Ver))
@@ -139,8 +128,6 @@ for field in field_list:
 #        print shcommand
 #        S.call(shcommand, shell=True)
 
-    # Set up the ww command. Because the current ww version soes not have saved
-    # any internal defaults, they have to be given by the command line.
     shcommand = ww
     shcommand += ' -c default.ww'
     shcommand += ' -WEIGHT_NAMES ""' #% (weight_fits_file,)
@@ -164,31 +151,31 @@ for field in field_list:
 #    S.Popen(shcommand, shell=True)
 
 
-    # Save the masked percentage value.
-    # Currently disabled because GETAREA is not available in the current ww
-    # version.
+    #
+    # save the masked percentage value
+    #
     #shcommand = "dfits %s | fitsort -d EFF_AREA | awk '{print $2}'" % (mask_fits)
     #percentage = S.Popen(shcommand, shell=True, stdout=S.PIPE).communicate()[0].strip()
     #print >> txtf, field, percentage
 
     # Create a combined r-band coadd with the mask image.
-    # The construct with a1 = '%1' is necessary because otherwise Python
-    # interprets %1 as variable that has to be filled (similar to %s).
     a1 = '%1'
     a2 = '%2'
     shcommand = "ic '%s %s +' %s %s > %s" % (a1, a2, coadd, mask_fits, coadd_mask_fits,)
     print shcommand
     S.call(shcommand, shell=True)
 
-    # Make the colored image. Here we choose z_SDSS as red channel, i_SDSS as
-    # green channel and r_SDSS as blue channel.
+    #
+    # make the colored image
+    #
+    stiff = '/users/dklaes/Downloads/stiff-2.4.0/src/stiff'
     i_band = 'i_SDSS'
     coadd_i = os.path.join(image_dir, field, i_band, reduction, '%s_%s.%sA.swarp.cut.fits' % \
                              (field, i_band, Ver))
     z_band = 'z_SDSS'
     coadd_z = os.path.join(image_dir, field, z_band, reduction, '%s_%s.%sA.swarp.cut.fits' % \
                              (field, z_band, Ver))
-    stiff_var = ' -BINNING 8'
+    stiff_var = ' -BINNING 4'
 #    stiff_var += ' -GAMMA_TYPE SRGB'
 #    stiff_var += ' -SKY_TYPE MANUAL'
 #    stiff_var += ' -SKY_LEVEL 0.01,0.02,0.02'
@@ -196,7 +183,9 @@ for field in field_list:
     shcommand = '%s %s -OUTFILE_NAME %s %s %s %s' % (stiff, stiff_var, tiff, coadd_z, coadd_i, coadd_mask_fits)
     S.call(shcommand, shell=True)
 
-    # Convert the final TIFF image to jpg.
+    #
+    # convert to jpg and place file under public_html
+    #
     jpg = '%s/%s.jpg' % (final_mask_dir, field)
     shcommand = 'convert %s %s' % (tiff, jpg)
     S.call(shcommand, shell=True)
