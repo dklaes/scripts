@@ -1,3 +1,5 @@
+# USERNAME is the name of the user who first created a region file for this image.
+USERNAME=$1
 # GITDIR is the directory where we have the THELI git repository.
 GITDIR=/users/dklaes/git/
 SURVEY=KIDS
@@ -19,10 +21,15 @@ do
       echo ${POINTING}
 
       if [ -f ${GITDIR}/ATLAS/regs/${FILTER}/${RUN}/${IMAGE} ]; then
-        cat regs/${IMAGE} | grep -v "#" >> ${GITDIR}/ATLAS/regs/${FILTER}/${RUN}/${IMAGE}
+        cat regs/${IMAGE} | grep -v "#" | sed 's/polygon/POLYGON/g' >> ${GITDIR}/ATLAS/regs/${FILTER}/${RUN}/${IMAGE}
       else
-        cat regs/${IMAGE} | grep -v "#" > ${IMAGE}.tmp
-        cat header.reg ${IMAGE}.tmp > ${GITDIR}/ATLAS/regs/${FILTER}/${RUN}/${IMAGE}
+        cat regs/${IMAGE} | grep -v "#" | sed 's/polygon/POLYGON/g' > ${IMAGE}.tmp
+        if [ "${USERNAME}" == "" ]; then
+          cat header.reg ${IMAGE}.tmp | sed 's/USERNAME/unknown/' > ${GITDIR}/ATLAS/regs/${FILTER}/${RUN}/${IMAGE}
+        else
+          cat header.reg ${IMAGE}.tmp | sed "s/USERNAME/${USERNAME}/" > ${GITDIR}/ATLAS/regs/${FILTER}/${RUN}/${IMAGE}
+        fi
+        rm ${IMAGE}.tmp
       fi
     fi
   done
