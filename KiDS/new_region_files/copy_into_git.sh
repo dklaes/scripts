@@ -21,7 +21,7 @@ do
       echo ${POINTING}
 
       if [ -f ${GITDIR}/ATLAS/regs/${FILTER}/${RUN}/${IMAGE} ]; then
-        cat regs/${IMAGE} | grep -v "#" | sed 's/polygon/POLYGON/g' >> ${GITDIR}/ATLAS/regs/${FILTER}/${RUN}/${IMAGE}
+        cat regs/${IMAGE} | grep -v "#" | grep -v "Region" | grep -v "global" | grep -v "physical" | sed 's/polygon/POLYGON/g' >> ${GITDIR}/ATLAS/regs/${FILTER}/${RUN}/${IMAGE}
       else
         cat regs/${IMAGE} | grep -v "#" | sed 's/polygon/POLYGON/g' > ${IMAGE}.tmp
         if [ "${USERNAME}" == "" ]; then
