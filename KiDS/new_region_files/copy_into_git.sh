@@ -23,7 +23,7 @@ do
       if [ -f ${GITDIR}/ATLAS/regs/${FILTER}/${RUN}/${IMAGE} ]; then
         cat regs/${IMAGE} | grep -v "#" | grep -v "Region" | grep -v "global" | grep -v "physical" | sed 's/polygon/POLYGON/g' >> ${GITDIR}/ATLAS/regs/${FILTER}/${RUN}/${IMAGE}
       else
-        cat regs/${IMAGE} | grep -v "#" | sed 's/polygon/POLYGON/g' > ${IMAGE}.tmp
+        cat regs/${IMAGE} | grep -v "#" | grep -v "Region" | grep -v "global" | grep -v "physical" | sed 's/polygon/POLYGON/g' > ${IMAGE}.tmp
         if [ "${USERNAME}" == "" ]; then
           cat header.reg ${IMAGE}.tmp | sed 's/USERNAME/unknown/' > ${GITDIR}/ATLAS/regs/${FILTER}/${RUN}/${IMAGE}
         else
