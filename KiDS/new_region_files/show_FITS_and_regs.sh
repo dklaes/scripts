@@ -5,5 +5,5 @@ for IMAGE in `ls --color=none FITS/`
 do
   echo ${IMAGE}
   IMAGENAME=`basename ${IMAGE} .sub.fits | awk -F"OFCS" '{print $1}'`
-  ds9 -zscale FITS/${IMAGE} -regions regs/${IMAGENAME}.reg
+  ds9 -zoom 0.5 -zscale FITS/${IMAGE} -regions regs/${IMAGENAME}.reg
 done
