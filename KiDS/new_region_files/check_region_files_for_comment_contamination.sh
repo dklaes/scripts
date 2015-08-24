@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-for FILENAME in `find ./regs/ -name \*.reg`
-do
-    NUM=`grep Region ${FILENAME} | grep -cv "#"`
-    if [ "${NUM}" == "1" ]; then
-      echo ${FILENAME}
-=======
 DIR=$1
 
 for FILENAME in `find ${DIR}/ -name \*.reg`
@@ -27,6 +20,5 @@ do
     NUM4=`grep -c polygon ${FILENAME}`
     if [ "${NUM4}" != "0" ]; then
       echo "'polygon' instead of 'POLYGON' found: ${FILENAME}"
->>>>>>> bc2d18ee7334515469028fe4afa12d723d522d7a
     fi
 done
