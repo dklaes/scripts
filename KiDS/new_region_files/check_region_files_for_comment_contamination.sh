@@ -28,3 +28,12 @@ do
       echo "Several 'POLYGON' in one line found: ${FILENAME}"
     fi
 done
+
+
+find ${DIR}/ -name \*.reg | grep -v 'OMEGA.[0-9]\{4\}-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]:[0-9][0-9]:[0-9][0-9].[0-9]\+' > wrong_format.txt_$$
+NUM=`wc -l wrong_format.txt_$$ | awk '{print $1}'`
+if [ ${NUM} -ne 0 ]; then
+  echo "Files with from filename format:"
+  cat wrong_format.txt_$$
+fi
+rm wrong_format.txt_$$
