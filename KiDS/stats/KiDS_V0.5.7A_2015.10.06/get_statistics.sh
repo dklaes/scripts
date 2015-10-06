@@ -3,7 +3,7 @@ VERSION=V0.5.7A
 
 MD=/disk3/erben/KIDSCOLLAB_V0.5.7/
 
-for FILTER in r_SDSS
+for FILTER in r_SDSS i_SDSS
 do
   rm mag_limit_individual_${FILTER}.txt
   rm mag_limit_${FILTER}.txt
