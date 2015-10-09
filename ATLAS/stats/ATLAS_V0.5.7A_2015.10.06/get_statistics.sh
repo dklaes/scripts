@@ -7,7 +7,8 @@ for FILTER in u_SDSS g_SDSS r_SDSS i_SDSS z_SDSS
 do
   rm mag_limit_individual_${FILTER}.txt
   rm mag_limit_${FILTER}.txt
-
+  rm seeing_individual_${FILTER}.txt
+  rm seeing_${FILTER}.txt
 
   for POINTING in `ls -1 --color=none ${MD} | grep ${SURVEY}_`
   do
