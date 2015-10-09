@@ -12,11 +12,11 @@ do
   for POINTING in `ls -1 --color=none ${MD} | grep ${SURVEY}_`
   do
     ldactoasc -i ${MD}/${POINTING}/${FILTER}/precoadd_${VERSION}/cat/${VERSION}.cat \
-              -t STATS -k V0.5.7A IMAGENAME -b -s | awk '$1==1 {print $2}' \
+              -t STATS -k V0.5.6A IMAGENAME -b -s | awk '$1==1 {print $2}' \
               >> tmp_${FILTER}_$$
 
     ldactoasc -i ${MD}/${POINTING}/${FILTER}/precoadd_${VERSION}/cat/${VERSION}.cat \
-              -t STATS -k V0.5.9A IMAGENAME -b -s | awk '$1==1 {print $2}' \
+              -t STATS -k V0.5.7A IMAGENAME -b -s | awk '$1==1 {print $2}' \
               >> tmp_${FILTER}_$$
 
     # Getting information for limiting magnitude.
